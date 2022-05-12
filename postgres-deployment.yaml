@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  namespace: lab
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-p
+  template:
+    metadata:
+      labels:
+        app: postgres-p
+    spec:
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: persistent-volume-claim
+      containers:
+      - name: postgres-c
+        image: # VER COMO ES LA IMAGEN CON EL REGISTRY
+        args:
+        - /bin/sh
+        - -c
+        - touch /tmp/healthy
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/healthy
+          initialDelaySeconds: 10
+          periodSeconds: 60
+        resources:
+          limits:
+            memory: "400Mi"
+            cpu: "400m"
+        ports:
+        - containerPort: 6666
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html" # VER DONDE ESTAN LOS DATOS DE LA BBDD
+          name: postgres-storage
+          subPath: bbdd

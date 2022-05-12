@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-deployment
+  namespace: lab
+  labels:
+    app: apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apache-p
+  template:
+    metadata:
+      labels:
+        app: apache-p
+    spec:
+      volumes:
+      - name: apache-storage
+        persistentVolumeClaim:
+          claimName: persistent-volume-claim
+      containers:
+      - name: apache-c
+        image: # VER COMO ES LA IMAGEN CON EL REGISTRY
+        args:
+        - /bin/sh
+        - -c
+        - touch /tmp/healthy
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/healthy
+          initialDelaySeconds: 10
+          periodSeconds: 90
+          successThreshold: 3
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html" # VER DONDE ESTA EL HTML EN MI UBUNTU
+          name: apache-storage
+          subPath: apache

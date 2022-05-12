@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: persistent-volume-claim
+  namespace: lab
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce # VER QUE TIPO DE ACCESO ES
+  resources:
+    requests:
+      storage: 3Gi # VER CUANTO ES
